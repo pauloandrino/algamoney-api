@@ -68,6 +68,19 @@ public class LancamentoResource {
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, lancamentoSalvo.getCodigo()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoSalvo);
 	}
+
+	@PutMapping("/{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_LANCAMENTO') and #oauth2.hasScope('write')")
+	public  ResponseEntity<Lancamento> atualizar(@PathVariable Long codigo, @Valid @RequestBody Lancamento lancamento) {
+
+		try {
+			Lancamento lancamentoSalvo = lancamentoService.atualizar(codigo, lancamento);
+			return ResponseEntity.ok(lancamentoSalvo);
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.notFound().build();
+		}
+
+	}
 	
 	@ExceptionHandler({ PessoaInexistenteOuInativaException.class })
 	public ResponseEntity<Object> handlePessoaInexistenteOuInativaException(PessoaInexistenteOuInativaException ex) {
